@@ -142,6 +142,28 @@ class CartService
             session(['cart' => $cart]);
         }
     }
+
+    public function mergeSessionCartDatabase(): void {
+        $sessionCart = session('cart', []);
+
+        if (empty($sessionCart)) {
+            return;
+        }
+
+        $userId = Auth::id();
+
+        foreach ($sessionCart as $tireId => $quantity) {
+            $cartItem = CartItem::firstOrNew([
+                'user_id'   => $userId,
+                'tire_id'   => $tireId,
+            ]);
+
+            $cartItem->quantity = ($cartItem->exists ? $cartItem->quantity : 0) + $quantity;
+            $cartItem->save();
+        }
+
+        session()->forget('cart');
+    }
 }
 
 ?>

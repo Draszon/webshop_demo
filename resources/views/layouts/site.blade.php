@@ -16,7 +16,7 @@
             x-data="{
                 mobileMenuOpen: false,
                 menuItems: [
-                    { content: 'Főoldal', link: '#fooldal' },
+                    { content: 'Főoldal', link: '{{ route('home') }}' },
                     { content: 'Nyári gumi', link: '#nyar-igumi' },
                     { content: 'Téli gumi', link: '#teli-gumi' },
                     { content: 'Négyévszakos', link: '#negyevszakos' },

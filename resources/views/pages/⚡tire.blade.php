@@ -106,9 +106,9 @@ new #[Layout('layouts::site'), Title('Autógumi webshop')] class extends Compone
     /**
      * Fejlesztési célból kiírja a munkamenet aktuális kosártartalmát.
      */
-    public function dumpCart()
+    public function dumpCart(CartService $cartService)
     {
-        dd(session('cart'));
+        dd($cartService->getCartItems());
     }
 
     /**
@@ -166,7 +166,7 @@ new #[Layout('layouts::site'), Title('Autógumi webshop')] class extends Compone
                                 <select wire:model.live="filteredSearch.diameter" class="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 font-semibold">
                                     <option value="">Összes</option>
                                     @foreach ($diameterFilter as $diameter)
-                                        <option value="{{ $diameter }}">{{ $diameter }}</option>
+                                        <option value="{{ $diameter }}">R{{ $diameter }}</option>
                                     @endforeach
                                 </select>
                             </div>

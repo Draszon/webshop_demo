@@ -5,7 +5,10 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Auth\Events\Login;
+use App\Listeners\MergeCartOnLogin;
 use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        //1. Páros: Bejelentkezéskor a session kosarát átmásolj az adatbázisba
+        Event::listen(
+            Login::class,
+            MergeCartOnLogin::class,
+        );
     }
 
     /**
