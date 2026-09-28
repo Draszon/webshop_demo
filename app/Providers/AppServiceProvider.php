@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
 
-        //1. Páros: Bejelentkezéskor a session kosarát átmásolj az adatbázisba
+        // Bejelentkezéskor a session kosarát átmásolj az adatbázisba
         Event::listen(
             Login::class,
             MergeCartOnLogin::class,
