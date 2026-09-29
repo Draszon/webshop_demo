@@ -4,7 +4,6 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
-use App\Models\CartItem;
 use App\Services\CartService;
 use Illuminate\Support\Collection;
 
@@ -164,8 +163,8 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
                         </div>
 
                         <!-- Akció gomb (Call to Action) -->
-                        <a href="#" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm shadow-md mt-6">
-                            Tovább a pénztárhoz
+                        <a href="{{ route('dataCheck') }}" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm shadow-md mt-6">
+                            Tovább
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                             </svg>
