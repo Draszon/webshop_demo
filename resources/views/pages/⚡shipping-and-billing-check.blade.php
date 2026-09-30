@@ -7,7 +7,7 @@ use Livewire\Attributes\Title;
 new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extends Component
 {
     //Számlázási adatok
-    public $name;
+    public $billing_name;
     public $billing_tax_number;
     public $billing_zip;
     public $billing_city;
@@ -26,7 +26,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
     {
         $user = Auth::user();
 
-        $this->name = $user->name;
+        $this->billing_name = $user->billing_name;
         $this->billing_tax_number = $user->billing_tax_number;
         $this->billing_zip = $user->billing_zip;
         $this->billing_city = $user->billing_city;
@@ -47,7 +47,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
 
         $validated = $this->validate(
             [
-                'name' => 'required|string|max:255',
+                'billing_name' => 'required|string|max:255',
                 'billing_tax_number' => 'nullable|string|max:13',
                 'billing_zip' => 'required|string|max:10',
                 'billing_city' => 'required|string|max:255',
@@ -121,9 +121,9 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
                             <label for="checkout_billing_name" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
                                 Számlázási Név / Cégnév
                             </label>
-                            <input wire:model="name" type="text" id="checkout_billing_name" name="billing_name" value="Kovács János" required
+                            <input wire:model="billing_name" type="text" id="checkout_billing_name" name="billing_name" value="Kovács János" required
                                    class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:outline-none transition-all">
-                            @error('name')
+                            @error('billing_name')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
                         </div>
@@ -291,7 +291,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
                     Vissza a kosárhoz
                 </a>
                 
-                <button type="submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+                <button type="submit" class="cursor-pointer w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
                     <span>Tovább</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>

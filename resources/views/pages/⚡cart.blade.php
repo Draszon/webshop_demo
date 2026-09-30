@@ -18,6 +18,12 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
         return app(CartService::class)->getCartItems();
     }
 
+    #[Computed]
+    public function isEmpty(): bool
+    {
+        return $this->getCartItems->isEmpty();
+    }
+
     /**
      * Törli a kiválasztott tételt, majd értesíti a kosár többi komponensét a változásról.
      */
@@ -45,6 +51,15 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
         return app(CartService::class)->getCartItems()->sum(function ($item) {
             return $item->tire->price * $item->quantity;
         });
+    }
+
+    public function redirectToDataCheck()
+    {
+        if ($this->isEmpty) {
+            return;
+        }
+
+        return redirect()->route('dataCheck');
     }
 };
 
@@ -107,7 +122,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
                                 <!-- Mennyiség léptető -->
                                 <div class="flex items-center border border-gray-300 rounded-xl bg-gray-50 overflow-hidden">
                                     <button wire:click="quantityAdjust({{ $cartItem->tire->id }}, 'down')" type="button" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors">-</button>
-                                    <input type="text" :value="{{ $cartItem->quantity }}" class="w-10 text-center bg-transparent text-sm font-black text-gray-900 border-none focus:outline-none">
+                                    <input disabled type="text" :value="{{ $cartItem->quantity }}" class="w-10 text-center bg-transparent text-sm font-black text-gray-900 border-none focus:outline-none">
                                     <button wire:click="quantityAdjust({{ $cartItem->tire->id }}, 'up')" type="button" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors">+</button>
                                 </div>
 
@@ -149,26 +164,30 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
                             <span class="font-bold text-gray-800">{{ number_format($this->sumPrice, 0, ',', ' ') }} Ft</span>
                         </div>
 
-                        <div class="flex justify-between text-gray-600 pb-4 border-b border-gray-100">
+                        <!--<div class="flex justify-between text-gray-600 pb-4 border-b border-gray-100">
                             <span>Becsült szállítási díj</span>
                             <span class="font-bold text-emerald-600">{{ number_format(4500, 0, ',', ' ') }} Ft</span>
-                        </div>
+                        </div>-->
 
                         <!-- Végösszeg -->
                         <div class="pt-2 flex justify-between items-end">
                             <div>
                                 <span class="block text-xs font-bold text-gray-400 uppercase">Fizetendő bruttó ár</span>
-                                <span class="text-2xl font-black text-gray-900">{{ number_format($this->sumPrice + 4500, 0, ',', ' ') }} <span class="text-sm font-normal text-gray-500">Ft</span></span>
+                                <span class="text-2xl font-black text-gray-900">{{ number_format($this->sumPrice, 0, ',', ' ') }} <span class="text-sm font-normal text-gray-500">Ft</span></span>
                             </div>
                         </div>
 
                         <!-- Akció gomb (Call to Action) -->
-                        <a href="{{ route('dataCheck') }}" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm shadow-md mt-6">
+                        <button 
+                            wire:click="redirectToDataCheck"
+                            @disabled($this->isEmpty)
+                            class="w-full cursor-pointer bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm shadow-md mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-600"
+                        >
                             Tovább
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                             </svg>
-                        </a>
+                        </button>                        
 
                         <!-- Biztonsági garanciák -->
                         <div class="pt-4 flex items-center justify-center gap-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">

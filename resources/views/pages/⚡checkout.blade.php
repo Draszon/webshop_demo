@@ -6,7 +6,10 @@ use Livewire\Attributes\Title;
 
 new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Component
 {
-    //
+    public function mount()
+    {
+        dd(session('checkout'));
+    }
 };
 ?>
 

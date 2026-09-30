@@ -3,10 +3,31 @@
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use App\Models\ShippingMethod;
+use App\Models\PaymentMethod;
+use App\Services\CartService;
 
 new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód')] class extends Component
 {
-    //
+    public $shippingMethods;
+    public $paymentMethods;
+
+    public $selectedShipping;
+    public $selectedPayment;
+
+    public function mount()
+    {
+        $this->shippingMethods = ShippingMethod::all();
+        $this->paymentMethods = PaymentMethod::all();
+    }
+
+    public function savePaymentAndShippingMethod()
+    {
+        session()->put([
+            'checkout.shipping_method_id' => $this->selectedShipping,
+            'checkout.payment_method_id' => $this->selectedPayment,
+        ]);
+    }
 };
 ?>
 
@@ -25,7 +46,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
             </p>
         </div>
 
-        <form action="#" method="POST" class="space-y-8">
+        <form wire:submit="savePaymentAndShippingMethod" class="space-y-8">
             
             <!-- 1. SZÁLLÍTÁSI MÓDOK -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 space-y-6">
@@ -34,75 +55,24 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                         <span class="w-3 h-3 rounded-full bg-red-600"></span>
                         1. Szállítási Mód Kiválasztása
                     </h2>
-                    <span class="text-xs font-semibold text-gray-400">4 db gumiabroncs a kosárban</span>
                 </div>
 
                 <div class="space-y-3">
+
+                    @foreach ($shippingMethods as $shippingMethod)
+                        <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
+                            <div class="flex items-center gap-4">
+                                <input wire:model.live="selectedShipping" type="radio" name="shipping_method" value="{{ $shippingMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
+                                <div>
+                                    <span class="font-bold text-gray-900 text-sm sm:text-base">{{ $shippingMethod->name }}</span>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="block text-sm sm:text-base font-extrabold text-gray-900">+ {{ $shippingMethod->cost }} Ft</span>
+                            </div>
+                        </label>
+                    @endforeach
                     
-                    <!-- DPD Futár -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border-2 border-red-600 bg-red-50/30 cursor-pointer transition-all hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="shipping_method" value="dpd" checked class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-gray-900 text-sm sm:text-base">DPD Gumiabroncs Futárszolgálat</span>
-                                    <span class="text-[10px] font-black bg-red-100 text-red-700 px-2 py-0.5 rounded uppercase">Ajánlott</span>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-0.5">Közvetlen házhozszállítás specifikus gumiabroncs csomagolásban (1-2 munkanap).</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <span class="block text-sm sm:text-base font-extrabold text-gray-900">3.960 Ft</span>
-                            <span class="text-[11px] text-gray-400">990 Ft / db</span>
-                        </div>
-                    </label>
-
-                    <!-- GLS Futár -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="shipping_method" value="gls" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <span class="font-bold text-gray-900 text-sm sm:text-base">GLS Hungary Futárszolgálat</span>
-                                <p class="text-xs text-gray-500 mt-0.5">Gyors és pontos házhozszállítás SMS és E-mail értesítéssel.</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <span class="block text-sm sm:text-base font-extrabold text-gray-900">4.400 Ft</span>
-                            <span class="text-[11px] text-gray-400">1.100 Ft / db</span>
-                        </div>
-                    </label>
-
-                    <!-- Partner Gumiszerviz / Átszerelés -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="shipping_method" value="service_point" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-gray-900 text-sm sm:text-base">Átvétel Partner Gumiszervizben</span>
-                                    <span class="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded">Helyszíni szereléssel</span>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-0.5">A gumikat közvetlenül a választott gumis műhelybe szállítjuk, ahol fel is szerelik neked.</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <span class="block text-sm sm:text-base font-extrabold text-green-600">INGYENES</span>
-                            <span class="text-[11px] text-gray-400">Szállítás a szervizbe</span>
-                        </div>
-                    </label>
-
-                    <!-- Személyes átvétel telephelyen -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="shipping_method" value="pickup" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <span class="font-bold text-gray-900 text-sm sm:text-base">Személyes átvétel központi raktárunkban</span>
-                                <p class="text-xs text-gray-500 mt-0.5">3300 Eger, Kerecsendi út 10. (Azonnal átvehető, ha raktáron van)</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <span class="block text-sm sm:text-base font-extrabold text-green-600">INGYENES</span>
-                        </div>
-                    </label>
 
                 </div>
             </div>
@@ -117,42 +87,19 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                 </div>
 
                 <div class="space-y-3">
+
+                    @foreach ($paymentMethods as $paymentMethod)
+                        <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
+                            <div class="flex items-center gap-4">
+                                <input wire:model.live="selectedPayment" type="radio" name="payment_method" value="{{ $paymentMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
+                                <div>
+                                    <span class="font-bold text-gray-900 text-sm sm:text-base">{{ $paymentMethod->name }}</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-gray-700">+ {{ $paymentMethod->cost }}</span>
+                        </label>
+                    @endforeach
                     
-                    <!-- Bankkártyás fizetés -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border-2 border-red-600 bg-red-50/30 cursor-pointer transition-all hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="payment_method" value="card" checked class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <span class="font-bold text-gray-900 text-sm sm:text-base">Online bankkártyás fizetés (Barion / SimplePay)</span>
-                                <p class="text-xs text-gray-500 mt-0.5">Biztonságos, azonnali fizetés bármilyen Visa, Mastercard vagy Maestro kártyával.</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-md border border-green-200">Díjmentes</span>
-                    </label>
-
-                    <!-- Utánvét -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="payment_method" value="cod" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <span class="font-bold text-gray-900 text-sm sm:text-base">Utánvét (Fizetés átvételkor a futárnál)</span>
-                                <p class="text-xs text-gray-500 mt-0.5">Fizess készpénzzel vagy bankkártyával a futárnak a csomag átvételekor.</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-extrabold text-gray-700">+ 490 Ft</span>
-                    </label>
-
-                    <!-- Banki átutalás -->
-                    <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
-                        <div class="flex items-center gap-4">
-                            <input type="radio" name="payment_method" value="transfer" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div>
-                                <span class="font-bold text-gray-900 text-sm sm:text-base">Előre utalás (Banki átutalás)</span>
-                                <p class="text-xs text-gray-500 mt-0.5">Díjbekérőt küldünk e-mailben, az összeg beérkezése után indítjuk a csomagot.</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-md border border-green-200">Díjmentes</span>
-                    </label>
 
                 </div>
             </div>
@@ -166,7 +113,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                     Vissza az adatokhoz
                 </a>
                 
-                <button type="submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+                <button type="submit" class="cursor-pointer w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
                     <span>Tovább a rendelés összegzéséhez</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
