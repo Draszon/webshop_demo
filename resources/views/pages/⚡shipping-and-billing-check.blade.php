@@ -80,7 +80,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
         $user->fill($validated);
         $user->save();
 
-        return redirect()->route('pymentAndShipping');
+        return redirect()->route('paymentAndShipping');
     }
 };
 ?>
@@ -181,7 +181,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
                 <!-- Másolás Checkbox Kártya -->
                 <div class="px-6 sm:px-8 py-4 bg-gray-50/80 border-y border-gray-200">
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="same_as_billing" checked class="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500 flex-shrink-0">
+                        <input type="checkbox" name="same_as_billing" checked class="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500 shrink-0">
                         <span class="text-xs font-bold text-gray-700">A szállítási adatok megegyeznek a számlázási adatokkal</span>
                     </label>
                 </div>

@@ -9,7 +9,7 @@ Route::livewire('/kosar', 'pages::cart')->name('cart');
 
 Route::middleware(EnsureCheckoutIsValid::class)->group(function () {
     Route::livewire('/adatellenorzes', 'pages::shipping-and-billing-check')->name('dataCheck');
-    Route::livewire('/szallitas-es-fizetes', 'pages::payment')->name('pymentAndShipping');
+    Route::livewire('/szallitas-es-fizetes', 'pages::payment')->name('paymentAndShipping');
     Route::livewire('/osszegzes', 'pages::checkout')->name('checkout');
 });
 

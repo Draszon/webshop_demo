@@ -35,9 +35,15 @@ class EnsureCheckoutIsValid
             return redirect()->route('filter');
         }
 
-        if ($request->route()->getName() === 'pymentAndShipping'|| $request->route()->getName() === 'checkout') {
+        if ($request->route()->getName() === 'paymentAndShipping'|| $request->route()->getName() === 'checkout') {
             if (collect($requiredFields)->contains(fn ($value) => blank($value))) {
                 return redirect()->route('dataCheck');
+            }
+        }
+        
+        if ($request->route()->getName() === 'checkout') {
+            if (!$request->session()->get('checkout.shipping_method_id') && !$request->session()->get('checkout.payment_method_id')) {
+                return redirect()->route('paymentAndShipping');
             }
         }
 

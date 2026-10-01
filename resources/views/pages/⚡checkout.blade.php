@@ -161,7 +161,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Com
 
                 <!-- AKCIÓGOMBOK -->
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-                    <a href="#" class="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-100 transition-colors text-center flex items-center justify-center gap-2">
+                    <a href="{{ route('paymentAndShipping') }}" class="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-100 transition-colors text-center flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>

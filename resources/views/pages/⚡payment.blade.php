@@ -27,6 +27,8 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
             'checkout.shipping_method_id' => $this->selectedShipping,
             'checkout.payment_method_id' => $this->selectedPayment,
         ]);
+
+        return redirect()->route('checkout');
     }
 };
 ?>
@@ -62,7 +64,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                     @foreach ($shippingMethods as $shippingMethod)
                         <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
                             <div class="flex items-center gap-4">
-                                <input wire:model.live="selectedShipping" type="radio" name="shipping_method" value="{{ $shippingMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
+                                <input required wire:model.live="selectedShipping" type="radio" name="shipping_method" value="{{ $shippingMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
                                 <div>
                                     <span class="font-bold text-gray-900 text-sm sm:text-base">{{ $shippingMethod->name }}</span>
                                 </div>
@@ -91,7 +93,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                     @foreach ($paymentMethods as $paymentMethod)
                         <label class="relative flex items-center justify-between p-4 sm:p-5 rounded-xl border border-gray-200 bg-white cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50">
                             <div class="flex items-center gap-4">
-                                <input wire:model.live="selectedPayment" type="radio" name="payment_method" value="{{ $paymentMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
+                                <input required wire:model.live="selectedPayment" type="radio" name="payment_method" value="{{ $paymentMethod->id }}" class="w-5 h-5 text-red-600 border-gray-300 focus:ring-red-500">
                                 <div>
                                     <span class="font-bold text-gray-900 text-sm sm:text-base">{{ $paymentMethod->name }}</span>
                                 </div>
