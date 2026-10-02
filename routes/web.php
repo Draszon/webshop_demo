@@ -13,6 +13,8 @@ Route::middleware(EnsureCheckoutIsValid::class)->group(function () {
     Route::livewire('/osszegzes', 'pages::checkout')->name('checkout');
 });
 
+Route::livewire('/koszonet/{order}', 'pages::thanks')->name('thanks');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });

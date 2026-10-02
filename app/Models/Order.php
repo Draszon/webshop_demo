@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'shipping_address',
     'shipping_comment',
     'shipping_method',
+    'shipping_cost',
 ])]
 class Order extends Model
 {

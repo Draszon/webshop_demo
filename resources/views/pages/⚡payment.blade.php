@@ -19,6 +19,9 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
     {
         $this->shippingMethods = ShippingMethod::all();
         $this->paymentMethods = PaymentMethod::all();
+
+        $this->selectedShipping = session('checkout.shipping_method_id');
+        $this->selectedPayment = session('checkout.payment_method_id');
     }
 
     public function savePaymentAndShippingMethod()
@@ -98,7 +101,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód
                                     <span class="font-bold text-gray-900 text-sm sm:text-base">{{ $paymentMethod->name }}</span>
                                 </div>
                             </div>
-                            <span class="text-xs font-extrabold text-gray-700">+ {{ $paymentMethod->cost }}</span>
+                            <span class="text-xs font-extrabold text-gray-700">+ {{ $paymentMethod->cost }} Ft</span>
                         </label>
                     @endforeach
                     
