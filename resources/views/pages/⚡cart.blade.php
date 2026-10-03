@@ -7,6 +7,9 @@ use Livewire\Attributes\Computed;
 use App\Services\CartService;
 use Illuminate\Support\Collection;
 
+/**
+ * A bejelentkezett felhasználó kosarának megjelenítéséért és műveleteiért felelős Livewire komponens.
+ */
 new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Component
 {
     /**
@@ -18,6 +21,9 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
         return app(CartService::class)->getCartItems();
     }
 
+    /**
+     * Megállapítja, hogy üres-e a kosár.
+     */
     #[Computed]
     public function isEmpty(): bool
     {
@@ -53,13 +59,21 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
         });
     }
 
+    /**
+     * Üres kosár esetén megállítja a továbblépést, egyébként az adatok ellenőrzésére irányít.
+     */
     public function redirectToDataCheck()
     {
-        if ($this->isEmpty) {
-            return;
-        }
+        if (Auth::check()) {
+            if ($this->isEmpty) {
+                return;
+            }
 
-        return redirect()->route('dataCheck');
+            return redirect()->route('dataCheck');
+        } else {
+            return redirect()->route('dataCheck');
+        }
+        
     }
 };
 

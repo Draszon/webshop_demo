@@ -134,6 +134,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Com
                 return $order;
             });
 
+            session()->put('just_ordered', $order->order_number);
             return redirect()->route('thanks', ['order' => $order->order_number]);
 
         } catch (\Exception $e) {
@@ -286,7 +287,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Com
                 <!-- ÁSZF & Jogi Nyilatkozat Checkbox -->
                 <div class="pt-4 border-t border-gray-100">
                     <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" name="accept_terms" required class="w-5 h-5 mt-0.5 text-red-600 rounded border-gray-300 focus:ring-red-500 flex-shrink-0">
+                        <input type="checkbox" name="accept_terms" required class="w-5 h-5 mt-0.5 text-red-600 rounded border-gray-300 focus:ring-red-500 shrink-0">
                         <span class="text-xs sm:text-sm text-gray-600 leading-relaxed">
                             Elolvastam és elfogadom az <a href="#" class="text-red-600 underline font-bold">Általános Szerződési Feltételeket (ÁSZF)</a>, valamint hozzájárulok adataim kezeléséhez az <a href="#" class="text-red-600 underline font-bold">Adatkezelési Tájékoztatóban</a> foglaltak szerint. <span class="text-red-500">*</span>
                         </span>

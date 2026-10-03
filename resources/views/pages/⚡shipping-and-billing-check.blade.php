@@ -24,35 +24,49 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
 
     public function mount()
     {
-        $user = Auth::user();
+        if (Auth::user()) {
+            $user = Auth::user();
 
-        $this->billing_name = $user->billing_name;
-        $this->billing_tax_number = $user->billing_tax_number;
-        $this->billing_zip = $user->billing_zip;
-        $this->billing_city = $user->billing_city;
-        $this->billing_address = $user->billing_address;
+            $this->billing_name = $user->billing_name;
+            $this->billing_tax_number = $user->billing_tax_number;
+            $this->billing_zip = $user->billing_zip;
+            $this->billing_city = $user->billing_city;
+            $this->billing_address = $user->billing_address;
 
-        $this->shipping_name = $user->shipping_name;
-        $this->phone = $user->phone;
-        $this->email = $user->email;
-        $this->shipping_zip = $user->shipping_zip;
-        $this->shipping_city = $user->shipping_city;
-        $this->shipping_address = $user -> shipping_address;
-        $this->shipping_comment = $user->shipping_comment;
+            $this->shipping_name = $user->shipping_name;
+            $this->phone = $user->phone;
+            $this->email = $user->email;
+            $this->shipping_zip = $user->shipping_zip;
+            $this->shipping_city = $user->shipping_city;
+            $this->shipping_address = $user -> shipping_address;
+            $this->shipping_comment = $user->shipping_comment;
+        } else {
+            $this->billing_name = session('userData.billing_name');
+            $this->billing_tax_number = session('userData.billing_tax_number');
+            $this->billing_zip = session('userData.billing_zip');
+            $this->billing_city = session('userData.billing_city');
+            $this->billing_address = session('userData.billing_address');
+
+            $this->shipping_name = session('userData.shipping_name');
+            $this->phone = session('userData.phone');
+            $this->email = session('userData.email');
+            $this->shipping_zip = session('userData.shipping_zip');
+            $this->shipping_city = session('userData.shipping_city');
+            $this->shipping_address = session('userData.shipping_address');
+            $this->shipping_comment = session('userData.shipping_comment');            
+        }
     }
 
-    public function updateShipping()
+    public function validation()
     {
-        $user = Auth::user();
-
-        $validated = $this->validate(
+        return $this->validate(
             [
                 'billing_name' => 'required|string|max:255',
                 'billing_tax_number' => 'nullable|string|max:13',
                 'billing_zip' => 'required|string|max:10',
                 'billing_city' => 'required|string|max:255',
                 'billing_address' => 'required|string|max:255',
-
+                
                 'shipping_name' => 'required|string|max:255',
                 'phone' => 'required|string|max:30',
                 'email' => 'required|email|max:255',
@@ -61,11 +75,11 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
                 'shipping_address' => 'required|string|max:255',
                 'shipping_comment' => 'nullable|string|max:500',
             ], [
-                'name.required' => 'A számlázási név megadása kötelező.',
+                'billing_name.required' => 'A számlázási név megadása kötelező.',
                 'billing_zip.required' => 'A számlázási irányítószám megadása kötelező.',
                 'billing_city.required' => 'A számlázási város megadása kötelező.',
                 'billing_address.required' => 'A számlázási cím megadása kötelező.',
-
+                
                 'shipping_name.required' => 'Az átvevő nevének megadása kötelező.',
                 'phone.required' => 'A telefonszám megadása kötelező a futár miatt.',
                 'email.required' => 'Az e-mail cím megadása kötelező a visszaigazoláshoz.',
@@ -76,11 +90,27 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
                 'shipping_comment.max' => 'A megjegyzés legfeljebb 500 karakter lehet.',
             ]
         );
+    }
 
-        $user->fill($validated);
-        $user->save();
+    public function updateShipping()
+    {
+        if (Auth::user()) {
+            $user = Auth::user();
 
-        return redirect()->route('paymentAndShipping');
+            $validated = $this->validation();
+
+            $user->fill($validated);
+            $user->save();
+
+            return redirect()->route('paymentAndShipping');
+
+        } else {
+            $validated = $this->validation();
+            session(['userData' => $validated]);
+
+            return redirect()->route('paymentAndShipping');
+        }
+
     }
 };
 ?>
@@ -211,7 +241,7 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
 
                         <!-- shipping_phone -->
                         <div class="md:col-span-1 lg:col-span-2">
-                            <label for="checkout_shipping_phone" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                            <label for="phone" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
                                 Telefonszám <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="phone" type="tel" id="checkout_shipping_phone" name="shipping_phone" placeholder="+36 30 123 4567" required

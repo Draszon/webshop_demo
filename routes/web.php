@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureCheckoutIsValid;
+use App\Http\Middleware\UserOrderValidation;
 use Illuminate\Support\Facades\Route;
 
 Route::livewire('/', 'pages::home')->name('home');
@@ -13,7 +14,9 @@ Route::middleware(EnsureCheckoutIsValid::class)->group(function () {
     Route::livewire('/osszegzes', 'pages::checkout')->name('checkout');
 });
 
-Route::livewire('/koszonet/{order}', 'pages::thanks')->name('thanks');
+Route::livewire('/koszonet/{order}', 'pages::thanks')
+    ->middleware(UserOrderValidation::class)
+    ->name('thanks');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
