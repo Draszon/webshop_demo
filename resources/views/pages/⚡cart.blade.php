@@ -96,6 +96,11 @@ new #[Layout('layouts::site'), Title('GumiPro - Kosár')] class extends Componen
                 Vissza a vásárláshoz
             </a>
         </div>
+            @if (session()->has('error'))
+                <div class="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg">
+                    {{ session('error') }}
+                </div>
+            @endif
 
         <!-- FŐ KOSÁR TARTALOM (Rács elrendezés) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

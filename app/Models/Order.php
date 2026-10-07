@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'billing_city',
     'billing_address',
     'payment_method',
+    'payment_cost',
 
     // Szállítási snapshot
     'shipping_name',

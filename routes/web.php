@@ -20,6 +20,12 @@ Route::livewire('/koszonet/{order}', 'pages::thanks')
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::livewire('rendeleseim', 'pages::auth.my-orders')->name('myOrders');
+    
 });
+
+Route::livewire('rendelesek-kezelese', 'pages::auth.manage-orders')
+    ->middleware(['auth', 'can:access-admin'])
+    ->name('manageOrders');
 
 require __DIR__.'/settings.php';

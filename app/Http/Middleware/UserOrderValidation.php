@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Order;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserOrderValidation
@@ -18,13 +19,17 @@ class UserOrderValidation
     {
         $orderNumber = $request->route('order');
 
-        if (!session('just_ordered') && session('just_ordered') !== $orderNumber) {
+        if (!session('just_ordered') || session('just_ordered') !== $orderNumber) {
             return redirect()->route('home');
         }
 
-        $order = Order::where('order_number', $orderNumber)
-            ->where('user_id', $request->user()->id)
-            ->first();
+        if (Auth::check()) {
+            $order = Order::where('order_number', $orderNumber)
+                ->where('user_id', $request->user()->id)
+                ->first();
+        } else {
+            $order = Order::where('order_number', $orderNumber)->first();
+        }
         
         if (!$order) {
             abort(403, 'Helytelen azonosító');

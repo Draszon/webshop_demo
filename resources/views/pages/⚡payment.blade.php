@@ -5,7 +5,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use App\Models\ShippingMethod;
 use App\Models\PaymentMethod;
-use App\Services\CartService;
 
 new #[Layout('layouts::site'), Title('GumiPro - Szállítási és fizetési mód')] class extends Component
 {

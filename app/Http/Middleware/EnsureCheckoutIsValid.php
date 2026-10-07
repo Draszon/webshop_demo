@@ -51,13 +51,35 @@ class EnsureCheckoutIsValid
             }   
         } else {
             $cart = session('cart');
+            $userData = collect(session('userData', []));
+            $shippingAndPayment = session('checkout', []);
+
+            $requiredFields = [
+                'billing_name', 'billing_zip', 'billing_city', 'billing_address',
+                'shipping_name', 'phone', 'email', 'shipping_zip', 'shipping_city', 'shipping_address'
+            ];
+
+            $isValidUserData = collect($requiredFields)->every(function ($field) use ($userData) {
+                return $userData->has($field) && filled($userData->get($field));
+            });
+
+            $isValidShipping = filled($shippingAndPayment['shipping_method_id'] ?? null)
+                && filled($shippingAndPayment['payment_method_id'] ?? null);
 
             if (empty($cart)) {
                 return redirect()->route('filter');
             }
 
             if ($request->route()->getName() === 'paymentAndShipping'|| $request->route()->getName() === 'checkout') {
-                //
+                if (!$isValidUserData) {
+                    return redirect()->route('dataCheck');
+                }
+            }
+
+            if ($request->route()->getName() === 'checkout') {
+                if (!$isValidUserData && !$isValidShipping) {
+                    return redirect()->route('paymentAndShipping');
+                }
             }
         }
 

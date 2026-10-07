@@ -10,6 +10,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Events\Login;
 use App\Listeners\MergeCartOnLogin;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +36,12 @@ class AppServiceProvider extends ServiceProvider
             Login::class,
             MergeCartOnLogin::class,
         );
+
+        Gate::define('access-admin', function (User $user) {
+            return $user->is_admin
+                ? Response::allow()
+                : Response::deny('Nincs jogosultságod!');
+        });
     }
 
     /**

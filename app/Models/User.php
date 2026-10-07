@@ -26,8 +26,30 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'phone', 'billing_name', 'billing_tax_number', 'billing_zip', 'billing_city', 'billing_address', 'shipping_name', 'shipping_zip', 'shipping_city', 'shipping_address', 'shipping_comment'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Fillable([
+    'name',
+    'is_admin',
+    'email',
+    'password',
+    'phone',
+    'billing_name',
+    'billing_tax_number',
+    'billing_zip',
+    'billing_city',
+    'billing_address',
+    'shipping_name',
+    'shipping_zip',
+    'shipping_city',
+    'shipping_address',
+    'shipping_comment'
+])]
+
+#[Hidden([
+    'password',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
+    'remember_token'
+])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

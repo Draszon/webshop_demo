@@ -7,7 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['brand_id', 'category_id', 'pattern', 'slug', 'width', 'profile', 'diameter', 'season', 'speed_index', 'load_index', 'price', 'stock', 'image', 'is_active'])]
+#[Fillable([
+    'brand_id',
+    'category_id',
+    'pattern',
+    'slug',
+    'width',
+    'profile',
+    'diameter',
+    'season',
+    'speed_index',
+    'load_index',
+    'price',
+    'stock',
+    'image',
+    'is_active'
+])]
 class Tire extends Model
 {
     public function brand(): BelongsTo

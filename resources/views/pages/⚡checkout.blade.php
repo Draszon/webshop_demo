@@ -9,6 +9,7 @@ use App\Models\PaymentMethod;
 use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\CartItem;
+use App\Models\Tire;
 
 /**
  * Livewire komponens a rendelés adatainak ellenőrzéséhez és véglegesítéséhez.
@@ -26,16 +27,24 @@ new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Com
      */
     public function mount(CartService $cartService)
     {
-        $this->user = Auth::user();
-        $this->cartItems = $cartService->getCartItems();
-        $this->shipping = ShippingMethod::find(session('checkout.shipping_method_id'));
-        $this->payment = PaymentMethod::find(session('checkout.payment_method_id'));
+        if (Auth::check()) {
+            $this->user = Auth::user();
+            $this->cartItems = $cartService->getCartItems();
+            $this->shipping = ShippingMethod::find(session('checkout.shipping_method_id'));
+            $this->payment = PaymentMethod::find(session('checkout.payment_method_id'));
 
-        if (!$this->shipping || !$this->payment) {
-            session()->forget('checkout');
-            $this->redirectRoute('paymentAndShipping');
-            return;
+            if (!$this->shipping || !$this->payment) {
+                session()->forget('checkout');
+                $this->redirectRoute('paymentAndShipping');
+                return;
+            }
+        } else {
+            $this->user = (object) session('userData', []);
+            $this->cartItems = $cartService->getCartItems();
+            $this->shipping = ShippingMethod::find(session('checkout.shipping_method_id'));
+            $this->payment = PaymentMethod::find(session('checkout.payment_method_id'));
         }
+
     }
 
     /**
@@ -79,58 +88,113 @@ new #[Layout('layouts::site'), Title('GumiPro - Összegzés')] class extends Com
             // A tranzakció biztosítja, hogy a rendelés és a tételei együtt kerüljenek mentésre.
             $order = DB::transaction(function() {
                 // Zároljuk a kosártételeket, hogy párhuzamos rendelés ne dolgozza fel őket újra.
-                $cartItems = CartItem::where('user_id', auth()->id())
-                    ->lockForUpdate()
-                    ->get();
+                if (Auth::check()) {
+                    $cartItems = CartItem::where('user_id', auth()->id())
+                        ->lockForUpdate()
+                        ->get();
 
-                $orderNum = $this->orderNumber();
+                    $orderNum = $this->orderNumber();
 
-                // Üres kosárból vagy hiányos checkout-adatokkal nem véglegesíthető a rendelés.
-                if ($cartItems->isEmpty()) {
-                    throw new \Exception('A kosár üres, vagy a rendelés már feldolgozás alatt áll!');
-                }
+                    // Üres kosárból vagy hiányos checkout-adatokkal nem véglegesíthető a rendelés.
+                    if ($cartItems->isEmpty()) {
+                        throw new \Exception('A kosár üres, vagy a rendelés már feldolgozás alatt áll!');
+                    }
 
-                if (!session()->has('checkout.shipping_method_id') || !session()->has('checkout.payment_method_id')) {
-                    throw new \Exception('A szállítási és fizetési adatok hiányoznak!');
-                }
+                    if (!session()->has('checkout.shipping_method_id') || !session()->has('checkout.payment_method_id')) {
+                        throw new \Exception('A szállítási és fizetési adatok hiányoznak!');
+                    }
 
-                $order = Order::create([
-                    'user_id' => auth()->id(),
-                    'order_number' => $orderNum,
-                    'total_price'  => $this->totalPrice(),
-                    'status' => 'Folyamatban',
-                    'payment_status' => 'Nincs fizetve',
-                    'customer_name' => auth()->user()->name,
-                    'customer_email' => auth()->user()->email,
-                    'customer_phone' => auth()->user()->phone,
-                    'billing_name' => auth()->user()->billing_name,
-                    'billing_tax_number' => auth()->user()->billing_tax_number,
-                    'billing_zip' => auth()->user()->billing_zip,
-                    'billing_city' => auth()->user()->billing_city,
-                    'billing_address' => auth()->user()->billing_address,
-                    'shipping_name' => auth()->user()->shipping_name,
-                    'shipping_address' => auth()->user()->shipping_address,
-                    'shipping_method' => $this->shipping->id,
-                    'payment_method' => $this->payment->id,
-                    'shipping_comment' => auth()->user()->shipping_comment,
-                    'shipping_city' => auth()->user()->shipping_city,
-                    'shipping_zip' => auth()->user()->shipping_zip,
-                    'shipping_cost' => $this->shipping->cost,
-                ]);
-
-                // A rendelési tételek elmentik a terméket, a mennyiséget és az aktuális egységárat.
-                foreach ($cartItems as $item) {
-                    $order->orderItems()->create([
-                        'tire_id' => $item->tire_id,
-                        'quantity' => $item->quantity,
-                        'unit_price' => $item->tire?->price ?? 0,
+                    $order = Order::create([
+                        'user_id' => auth()->id(),
+                        'order_number' => $orderNum,
+                        'total_price'  => $this->totalPrice(),
+                        'status' => 'Folyamatban',
+                        'payment_status' => 'Nincs fizetve',
+                        'customer_name' => auth()->user()->name,
+                        'customer_email' => auth()->user()->email,
+                        'customer_phone' => auth()->user()->phone,
+                        'billing_name' => auth()->user()->billing_name,
+                        'billing_tax_number' => auth()->user()->billing_tax_number,
+                        'billing_zip' => auth()->user()->billing_zip,
+                        'billing_city' => auth()->user()->billing_city,
+                        'billing_address' => auth()->user()->billing_address,
+                        'shipping_name' => auth()->user()->shipping_name,
+                        'shipping_address' => auth()->user()->shipping_address,
+                        'shipping_method' => $this->shipping->name,
+                        'payment_method' => $this->payment->name,
+                        'payment_cost' => $this->payment->cost,
+                        'shipping_comment' => auth()->user()->shipping_comment,
+                        'shipping_city' => auth()->user()->shipping_city,
+                        'shipping_zip' => auth()->user()->shipping_zip,
+                        'shipping_cost' => $this->shipping->cost,
                     ]);
+
+                    // A rendelési tételek elmentik a terméket, a mennyiséget és az aktuális egységárat.
+                    foreach ($cartItems as $item) {
+                        $order->orderItems()->create([
+                            'tire_id' => $item->tire_id,
+                            'quantity' => $item->quantity,
+                            'unit_price' => $item->tire?->price ?? 0,
+                        ]);
+                    }
+                } else {
+                    $orderNum = $this->orderNumber();
+                    $cartItems = session('cart');
+
+                    // Üres kosárból vagy hiányos checkout-adatokkal nem véglegesíthető a rendelés.
+                    if (empty($cartItems)) {
+                        throw new \Exception('A kosár üres, vagy a rendelés már feldolgozás alatt áll!');
+                    }
+
+                    if (!session()->has('checkout.shipping_method_id') || !session()->has('checkout.payment_method_id')) {
+                        throw new \Exception('A szállítási és fizetési adatok hiányoznak!');
+                    }
+
+                    $order = Order::create([
+                        'user_id' => null,
+                        'order_number' => $orderNum,
+                        'total_price'  => $this->totalPrice(),
+                        'status' => 'Folyamatban',
+                        'payment_status' => 'Nincs fizetve',
+                        'customer_name' => $this->user->billing_name,
+                        'customer_email' => $this->user->email,
+                        'customer_phone' => $this->user->phone,
+                        'billing_name' => $this->user->billing_name,
+                        'billing_tax_number' => $this->user->billing_tax_number,
+                        'billing_zip' => $this->user->billing_zip,
+                        'billing_city' => $this->user->billing_city,
+                        'billing_address' => $this->user->billing_address,
+                        'shipping_name' => $this->user->shipping_name,
+                        'shipping_address' => $this->user->shipping_address,
+                        'shipping_method' => $this->shipping->name,
+                        'payment_method' => $this->payment->name,
+                        'payment_cost' => $this->payment->cost,
+                        'shipping_comment' => $this->user->shipping_comment,
+                        'shipping_city' => $this->user->shipping_city,
+                        'shipping_zip' => $this->user->shipping_zip,
+                        'shipping_cost' => $this->shipping->cost,
+                    ]);
+
+                    // A rendelési tételek elmentik a terméket, a mennyiséget és az aktuális egységárat.
+                    foreach ($cartItems as $tireId => $quantity) {
+
+                        $order->orderItems()->create([
+                            'tire_id' => $tireId,
+                            'quantity' => $quantity,
+                            'unit_price' => Tire::where('id', $tireId)->value('price') ?? 0,
+                        ]);
+                    }                    
                 }
 
                 // Sikeres rendelés után töröljük a kosártételeket és a checkout munkamenet-adatait.
-                CartItem::where('user_id', auth()->id())->delete();
-                session()->forget('checkout');
+                if (Auth::check()) {
+                    CartItem::where('user_id', auth()->id())->delete();
+                    session()->forget('checkout');
+                } else {
+                    session()->forget(['checkout', 'userData', 'cart']);
+                }
 
+                // Visszaadjuk, hogy később majd kívülről akár emailt is lehessen neki külden
                 return $order;
             });
 

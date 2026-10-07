@@ -47,9 +47,11 @@ new #[Layout('layouts::site'), Title('GumiPro - Adatellenőrzés')] class extend
             $this->billing_city = session('userData.billing_city');
             $this->billing_address = session('userData.billing_address');
 
-            $this->shipping_name = session('userData.shipping_name');
+            
             $this->phone = session('userData.phone');
             $this->email = session('userData.email');
+            
+            $this->shipping_name = session('userData.shipping_name');
             $this->shipping_zip = session('userData.shipping_zip');
             $this->shipping_city = session('userData.shipping_city');
             $this->shipping_address = session('userData.shipping_address');
